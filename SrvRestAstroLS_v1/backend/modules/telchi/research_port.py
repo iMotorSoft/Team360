@@ -13,20 +13,24 @@ import asyncio
 from dataclasses import asdict
 from hashlib import sha256
 import json
+from decimal import Decimal
 
 from modules.console.repositories import PermissionConsoleRepository
 from .exploratory_sql.authorized_foundation import EffectiveScope, SourcePolicy
 from .exploratory_sql.console_bridge import ConsoleResearchService
 from .exploratory_sql.console_repository import ResearchConsoleRepository
-from .exploratory_sql.contracts import Decision
-from .exploratory_sql.validator import Rejected
+from .exploratory_sql.contracts import (CandidateRelation, Decision,
+    ExploratoryQueryProposal)
+from .exploratory_sql.validator import Rejected, validate
 from .research_repository import ResearchRecoveryRepository
 
 # Presentation-safe fields only. Raw model prose, SQL, paths and evidence handles
 # stay in the private evidence sink and PG audit, never in the channel answer.
 PRESENTATION_FIELDS = ('status', 'business_answer', 'clarification', 'publication',
                        'snapshot', 'question_coverage', 'reason',
-                       'model_calls', 'sql_executions',
+                       'model_calls', 'sql_executions', 'elapsed_seconds',
+                       'required_measure', 'deterministic_continuations',
+                       'deterministic_contract_completion',
                        # A declared processing limit: measured budget and cause,
                        # never SQL, prose or evidence handles.
                        'observation_budget', 'partial_verified_figures')
@@ -165,8 +169,117 @@ class WhatsAppResearchPort:
             raise PermissionError('research_scope_denied')
         return authorized_business_resolution(resolution, scope, self.policies)
 
+    async def execute_known_measure(self, context, effective_scope):
+        """Execute the confirmed territorial line-net operation without Luna.
+
+        This is the existing Foundation research port using the existing binding,
+        validator and executor. It is deliberately invoked only after State Engine
+        confirmation; free investigation remains the fallback for unknown analyses.
+        """
+        state = (effective_scope or {}).get('state') or {}
+        if state.get('metric') != 'sales.net_amount':
+            return None
+        entity = state.get('entity_mention')
+        if isinstance(entity, dict):
+            territory = entity.get('text')
+        else:
+            territory = entity
+        if not territory:
+            branches = state.get('branches') or ()
+            territory = branches[0] if branches else None
+        period = state.get('period') or {}
+        start, end = period.get('start'), period.get('end_exclusive')
+        if not isinstance(territory, str) or not territory.strip() or not isinstance(start, str) or not isinstance(end, str):
+            return None
+
+        identity = context.sender_identity
+        scope = await self._resolve_scope(identity)
+        loop = __import__('asyncio').get_running_loop()
+
+        def run():
+            from .exploratory_sql.authorized_foundation import (
+                AuthorizedFoundationExecutor, open_binding)
+            from .exploratory_sql.business_measure import paired_component_proposal
+            from .exploratory_sql.foundation_dev import DevBudget
+
+            def fresh_scope():
+                return scope
+
+            binding, gaps = open_binding(
+                reader=self.service.reader, resolve_scope=fresh_scope,
+                policies=self.policies,
+                investigation_id='TELCHIAI_KNOWN_TERRITORIAL_LINE_NET_V1',
+                budget=DevBudget())
+            try:
+                context_issued = binding.context
+                sales = ExploratoryQueryProposal(
+                    sql=(
+                        'SELECT SUM(sales_line.line_total) AS line_total '
+                        'FROM sales_line INNER JOIN warehouse_business_location '
+                        'ON sales_line.whs_code = warehouse_business_location.warehouse_code '
+                        "WHERE sales_line.source_system='SAP_B1_HANA' "
+                        "AND sales_line.source_table='INV1' "
+                        f"AND sales_line.doc_date >= '{start}' AND sales_line.doc_date < '{end}' "
+                        "AND sales_line.canceled='N' AND sales_line.currency='BS' "
+                        "AND warehouse_business_location.mapping_status='VALIDATED' "
+                        "AND warehouse_business_location.mapping_source='BUSINESS_CONFIRMED' "
+                        "AND warehouse_business_location.business_location_code='"
+                        + territory.replace("'", "''").upper().replace(' ', '_') + "'"),
+                    objective='Confirmed territorial commercial-line sales component',
+                    justification='State Engine confirmed territorial line-net scope; execute the sales component with the authorized crosswalk.',
+                    requested_sources=('sales_line', 'warehouse_business_location'),
+                    expected_grain='one aggregate', expected_result='one numeric cell',
+                    candidate_relations=(CandidateRelation(
+                        'sales_line', 'whs_code', 'warehouse_business_location',
+                        'warehouse_code', 'Published authorized warehouse crosswalk'),),
+                    requested_budget=DevBudget())
+                credit = paired_component_proposal(
+                    sales, 'territorial_line_net', territory_code=territory)
+                if credit is None:
+                    raise RuntimeError('known_measure_counterpart_unavailable')
+                executed = []
+                for proposal in (sales, credit):
+                    decision, query = validate(proposal, context_issued)
+                    if decision.decision != Decision.ALLOW or query is None:
+                        raise RuntimeError('known_measure_validation_failed:' + decision.reason)
+                    with AuthorizedFoundationExecutor(
+                            context_issued, reader=self.service.reader, authorized=True) as executor:
+                        decision, result = executor.execute(proposal, context_issued)
+                    if decision.decision != Decision.ALLOW or result.status != 'COMPLETED' or result.truncated:
+                        raise RuntimeError('known_measure_execution_failed:' + decision.reason)
+                    if len(result.rows) != 1 or len(result.rows[0]) != 1:
+                        raise RuntimeError('known_measure_evidence_shape_failed')
+                    try:
+                        value = Decimal(str(result.rows[0][0]))
+                    except Exception as exc:
+                        raise RuntimeError('known_measure_evidence_value_failed') from exc
+                    if not value.is_finite():
+                        raise RuntimeError('known_measure_evidence_value_failed')
+                    executed.append((query.query_id, value, result))
+                sales_value, credit_value = executed[0][1], executed[1][1]
+                net_value = sales_value - credit_value
+                money = lambda value: f'{value:,.2f}'.replace(',', 'X').replace('.', ',').replace('X', '.')
+                answer = (f"Venta neta de líneas comerciales del alcance territorial confirmado: Bs {money(net_value)}. "
+                          f"Período {start} a {end} (fin exclusivo). "
+                          f"Ventas: Bs {money(sales_value)}; notas de crédito: Bs {money(credit_value)}. "
+                          'Líneas comerciales activas en BS, excluyendo anuladas; mapping territorial validado y confirmado. '
+                          f'Foundation: {context_issued.publication}; snapshot: {context_issued.snapshot}.')
+                return dict(status='VERIFIED_WITH_LIMITATIONS', business_answer=answer,
+                    publication=context_issued.publication, snapshot=context_issued.snapshot,
+                    required_measure='territorial_line_net', sql_executions=2,
+                    deterministic_contract_completion={'measure': 'commercial_line_net_amount.v1',
+                        'components': {'sales': str(sales_value), 'credit_memos': str(credit_value)},
+                        'value': str(net_value), 'evidence_verified': True,
+                        'query_ids': [item[0] for item in executed]},
+                    evidence=[item[0] for item in executed], reader_contract_gaps=list(gaps),
+                    authorization='AuthorizedFoundationExecutor; read-only; State Engine confirmed scope')
+            finally:
+                binding.close()
+
+        return await loop.run_in_executor(None, run)
+
     async def __call__(self, question, conversation_id, context, *, analysis_context_id=None,
-                       business_knowledge=None):
+                       business_knowledge=None, effective_scope=None):
         identity = context.sender_identity
         scope = await self._resolve_scope(identity)
         if not self._permitted(scope):
@@ -182,7 +295,8 @@ class WhatsAppResearchPort:
         if repo is None:
             report = await self.service.ask_scope(
                 resolve, question, self.evidence_sink_factory(),
-                conversation_id='whatsapp:' + str(conversation_id), business_knowledge=knowledge)
+                conversation_id='whatsapp:' + str(conversation_id), business_knowledge=knowledge,
+                effective_scope=effective_scope)
             return presentation(report)
 
         async def read(method):
@@ -222,7 +336,8 @@ class WhatsAppResearchPort:
         recovery = dict(saved['conversation_input'], binding=saved['receipt'].get('binding'))
         report = await self.service.ask_scope(resolve, question, self.evidence_sink_factory(),
             conversation_id='whatsapp:' + str(conversation_id),
-            recovery=recovery, checkpoint=checkpoint, business_knowledge=knowledge)
+            recovery=recovery, checkpoint=checkpoint, business_knowledge=knowledge,
+            effective_scope=effective_scope)
         result = presentation(report)
         await self.revalidate(context, saved['receipt'])
         saved.update(state='COMPLETED', result=result,

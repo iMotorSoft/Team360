@@ -98,6 +98,14 @@ Net documentary sales = sales_document sum(doc_total) MINUS credit_memo_document
 Gross sales = sales_document sum(doc_total). Filter canceled='N', currency='BS', dates and requested channel.
 For net pairs use identical WHERE filters on both tables; do not join their populations or repeat header money on lines.
 Commercial product analysis uses sales_line sum(line_total), BEFORE credit memos, not documentary net.
+Territorial business entities must be resolved through the authorized published
+warehouse_business_location crosswalk, never by product/customer text, branch names,
+prefixes or guessed SAP identifiers. For a territorial line measure, join
+sales_line.whs_code or credit_memo_line.whs_code to warehouse_business_location.warehouse_code,
+filter mapping_status='VALIDATED' and mapping_source='BUSINESS_CONFIRMED', and count each
+line once. Use the same mapping predicate independently for invoices and credit memos;
+never use sales_document.doc_total for a warehouse grouping. Preserve the entity's
+published business_location_code/name and verify mapping cardinality before finalizing.
 Discover product_business_type, classification_status and classification_rule_id, never use the BOM leaf flag alone.
 Unknown classification is NOT OTHER. Dates/coverage must be observed, never equated to complete calendar coverage.
 Discover named products and their presentations in ref_products, not customers by grammar alone.
@@ -131,6 +139,11 @@ No prescribed minimum query count: finish only after every requested part has ev
 Conversational efficiency: use catalog columns/constraints already supplied; do not rediscover them with SQL.
 Published dimension vocabularies in semantic_constraints are already observed filter metadata for this binding.
 Use their exact values to filter; do not repeat GROUP BY discovery of known channels or classification labels.
+For territorial questions the warehouse_business_location semantic constraint is the authoritative
+mapping vocabulary; do not spend discovery calls on ref_business_locations or ref_branches unless a
+specific unresolved contract requires them. Load at most sales_line, credit_memo_line and
+warehouse_business_location for a territorial line reconciliation, then issue the independent
+invoice/credit queries with the validated mapping predicates.
 Business sufficiency is NOT a successful SQL execution. Before finalizing, check the requested entity grain,
 product universe, measure, temporal scope and whether the selected claims actually answer the question.
 Customer accounts: group by card_code AND the observed customer name, not name alone. Different SAP codes
@@ -296,7 +309,7 @@ class Session:
         self.cancel = cancel or threading.Event()
 
     async def ask(self, question, save, *, luna=None, executor_factory=None,
-                  registry_factory=None):
+                  registry_factory=None, effective_scope=None):
         if self.authorized_binding:
             try:
                 self.authorized_binding.present(None, self.context)
@@ -329,12 +342,19 @@ class Session:
         # A follow-up that changes only period/channel cannot silently change
         # an explicitly requested measure. This is intent, not data authority.
         self.required_measure = requested_measure(question, self.required_measure)
+        # Territorial net-line requests still require both independent
+        # components. Reuse the existing net completeness verifier while the
+        # territorial system contract supplies the line-level measure.
+        scope_state = (effective_scope or {}).get('state') or {}
+        if scope_state.get('branches') or scope_state.get('entity_mention'):
+            self.required_measure = 'territorial_line_net'
         system = AUTHORIZED_SYSTEM if self.authorized_binding else SYSTEM
         factory = registry_factory or (lambda ctx: AskRegistry(ctx, cancel=self.cancel,
             executor_factory=executor_factory))
         await run(report, save, question=question, conversation=self.history, context=self.context,
             system=system, luna=luna or CancellableLuna(self.cancel, system=system), executor_factory=executor_factory,
             required_measure=self.required_measure, allow_query_batches=bool(self.authorized_binding),
+            effective_scope=effective_scope,
             compact_evidence_ids=bool(self.authorized_binding),
             registry_factory=factory, progress=self.progress, cancel=self.cancel,
             business_knowledge=(getattr(self.authorized_binding, 'business_knowledge', {})

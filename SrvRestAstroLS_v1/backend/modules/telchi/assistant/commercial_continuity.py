@@ -69,6 +69,10 @@ def request_contract(proposal, text, before, reference_result=None):
     delta = proposal['state_delta']
     sets = {'/' + k.strip().lstrip('/'): v for k, v in delta.get('set', {}).items()}
     unsets = ['/' + k.strip().lstrip('/') for k in delta.get('unset', [])]
+    # Luna may redundantly emit a null reset in both set and unset. Treat that
+    # representation as one clear operation; preserve conflicting non-null
+    # set/unset pairs for the State Engine's fail-closed validation.
+    unsets = [path for path in unsets if not (path in sets and sets[path] is None)]
     p = deepcopy(proposal)
     p['state_delta'] = dict(set=sets, unset=unsets)
 
@@ -83,6 +87,51 @@ def request_contract(proposal, text, before, reference_result=None):
         return dict(intent='REFINE', action='EXECUTE', clarification=None,
                     state_delta={'set': {'/product_offset': min(before.get('product_offset', 0) + 5, 45),
                                          '/limit': 50}, 'unset': []})
+
+    # A changed business entity does not prove that an old channel still
+    # applies. Ask only when both readings are materially different.
+    channel_words = re.search(r'\b(?:todos?|todas?)\s+los\s+canales?\b|\b(?:sin|cualquier)\s+canal', q)
+    horizontal_words = re.search(r'\bhorizontal\b', q)
+    # Luna may preserve a newly named commercial entity in entity_mention before
+    # the closed vocabulary can resolve it to branches. Treat that as a material
+    # dimension for the channel clarification; do not discard the original
+    # mention or fabricate a branch code.
+    new_entity = (sets.get('/branches') not in (None, [], {})
+                  or (isinstance(sets.get('/entity_mention'), dict)
+                      and sets['/entity_mention'].get('text')))
+    if new_entity and before.get('sales_channel') and not channel_words and not horizontal_words:
+        p.update(intent='REFINE', action='ASK', clarification={
+            'slot': 'sales_channel',
+            'question': '¿Seguimos con el canal horizontal o querés las ventas de todos los canales del Segundo Anillo?'
+        })
+        # The pending proposal must not contain the ambiguous old value; it is
+        # restored only by the user's explicit clarification. Luna sometimes
+        # repeats the inherited channel in `set`; remove that duplicate before
+        # adding the clear operation, otherwise State Engine correctly rejects
+        # the atomic delta as conflicting paths.
+        if not sets.get('/branches') and isinstance(sets.get('/entity_mention'), dict):
+            # Preserve the already resolved territorial mention when Luna omits
+            # the redundant branch array in its clarification proposal.
+            sets['/branches'] = [sets['/entity_mention']['text']]
+        sets.pop('/sales_channel', None)
+        if (before.get('pending') or {}).get('spec', {}).get('slot') == 'sales_channel':
+            p['action'] = 'EXECUTE'
+            p['intent'] = 'ANSWER_CLARIFICATION'
+        if '/sales_channel' not in unsets:
+            unsets.append('/sales_channel')
+        p['state_delta'] = dict(set=sets, unset=unsets)
+        return p
+    if channel_words and before.get('sales_channel'):
+        # Resolve the durable pending channel choice from its already-accredited
+        # proposal. Luna may omit the branch/period fields on the short answer;
+        # those fields must not disappear when the clarification is accepted.
+        pending = before.get('pending') or {}
+        proposed = pending.get('proposed') or {}
+        if pending.get('spec', {}).get('slot') == 'sales_channel':
+            for key in ('metric', 'period', 'branches', 'entity_mention'):
+                if '/' + key not in sets and proposed.get(key) is not None:
+                    put(**{key: proposed[key]})
+        put(sales_channel=None)
 
     # A new operation must not inherit presentation/analysis instructions.
     if proposal.get('intent') == 'NEW_QUERY' and not _OTHER_THINGS.search(q):

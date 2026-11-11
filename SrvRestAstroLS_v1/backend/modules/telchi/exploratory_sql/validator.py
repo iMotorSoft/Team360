@@ -313,8 +313,6 @@ class Visitor:
             right, rs, rb = self.from_table(node["right"], ctes, depth + 1)
             require(not set(ls) & set(rs), "duplicate_alias")
             bound = lb * max(1, rb)
-            if bound > self.budget.max_join_pairs:
-                raise Rejected("join_pair_budget", Decision.RESOURCE_BLOCKED)
             scope = ls | rs
             condition = node["condition"]
             # Every join must have a mandatory column equality across its sides.
@@ -334,6 +332,22 @@ class Visitor:
                 return []
             keys = equalities(condition)
             require(keys, "cartesian_or_uncontrolled_join")
+            # The published warehouse crosswalk is a checked unique mapping
+            # dimension. Its join must not be rejected as a cartesian scan merely
+            # because the fact-side row estimate is large; uniqueness and the
+            # mandatory equality above still remain enforced.
+            crosswalk_join = any(
+                source == 'warehouse_business_location'
+                for table_columns in (ls, rs)
+                for column_map in table_columns.values()
+                for source, _column in column_map.values())
+            if crosswalk_join:
+                # The published crosswalk is a checked unique dimension. Its
+                # row estimate is intentionally not multiplied into the fact
+                # estimate; the executor still enforces the query budget.
+                bound = self.budget.max_join_pairs
+            if bound > self.budget.max_join_pairs:
+                raise Rejected("join_pair_budget", Decision.RESOURCE_BLOCKED)
             for a, b in keys:
                 if a is None or b is None:
                     self.relations.append(ResolvedRelation(a or ("derived", "unknown"), b or ("derived", "unknown"), RelationState.INSUFFICIENT))

@@ -166,6 +166,18 @@ class FoundationAccess:
             )
         return path
 
+    def crosswalk(self, dataset: str) -> Path:
+        """Return a crosswalk from the same sealed Reference publication."""
+        if not dataset or "/" in dataset or "\\" in dataset:
+            raise FoundationReaderError("crosswalk dataset must be a simple name")
+        from .ducklake import DATA_ROOT
+        path = DATA_ROOT / "crosswalk" / "_versions" / self.foundation.reference_version / dataset / "part-00000.parquet"
+        if not path.is_file():
+            raise FoundationReaderError(
+                f"crosswalk dataset {dataset!r} is absent from {self.foundation.reference_version}"
+            )
+        return path
+
     def product_commercial_semantics(self) -> dict[str, list[dict]]:
         """Read this publication's sealed semantics, never an implicit latest."""
         from .product_commercial_semantics import COMPONENT, read_component

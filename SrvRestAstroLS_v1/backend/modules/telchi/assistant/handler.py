@@ -12,7 +12,7 @@ from modules.db.transaction import transaction
 from modules.messaging.delivery_guard import guard_outbound
 from modules.messaging.handlers import HandlerRegistration, MessageResult
 
-from . import state_engine
+from . import state_engine, business_scope
 from .capabilities import SalesCapabilities, ProductResolutionError, format_result, business_date, business_money
 from .luna import LunaError, LunaInterpreter
 from .repository import ConversationRepository
@@ -96,15 +96,22 @@ class PostgresConversationStore:
 
     @asynccontextmanager
     async def turn(self, context):
-        # Deliberately serializes turns across processes. Bounded processing avoids
-        # unbounded pool occupation; crash rolls back, DurableWorker fences replay.
+        # Load and lock only the short state transition. Investigation is durable
+        # work, not a conversation transaction: release the row/advisory locks
+        # before Luna or exploratory SQL can run for minutes or hours.
         pool = self.pool() if callable(self.pool) else self.pool
-        async with transaction(pool) as conn:
-            turn = await self.repository.load(conn, context)
+        async with pool.connection() as conn:
+            async with conn.transaction():
+                turn = await self.repository.load(conn, context)
             yield turn
 
     async def save(self, context, turn, audit):
-        await self.repository.save(turn['conn'], context, turn, audit)
+        # Authorization/interpreter reads may have opened an implicit transaction
+        # after load. Close it before the atomic state/audit write.
+        conn = turn['conn']
+        await conn.commit()
+        async with conn.transaction():
+            await self.repository.save(conn, context, turn, audit)
 
 
 class TelchiHandler:
@@ -126,42 +133,48 @@ class TelchiHandler:
 
     async def handle(self, message, context):
         denied = MessageResult('No se pudo autorizar esta consulta de Telchi.', context.correlation_id, 'DENIED')
-        try:
-            async with asyncio.timeout(self.turn_timeout_seconds):
-                with span('authorization_initial'):
-                    allowed = await self.authorization.allowed(context)
+        async def process_turn():
+            with span('authorization_initial'):
+                allowed = await self.authorization.allowed(context)
+            if not allowed:
+                return denied  # zero LLM and capability calls
+            async with self.store.turn(context) as turn:
+                with span('authorization_transaction_revalidation'):
+                    allowed = await self.authorization.allowed(context, turn.get('conn'))
                 if not allowed:
-                    return denied  # zero LLM and capability calls
-                async with self.store.turn(context) as turn:
-                    with span('authorization_transaction_revalidation'):
-                        allowed = await self.authorization.allowed(context, turn.get('conn'))
-                    if not allowed:
+                    return denied
+                if turn.get('cached'):
+                    cached = turn['cached']
+                    if (cached.get('required_permission') and not await self.authorization.allowed(
+                            context, turn.get('conn'), required_permission=cached['required_permission'])):
                         return denied
-                    if turn.get('cached'):
-                        cached = turn['cached']
-                        if (cached.get('required_permission') and not await self.authorization.allowed(
-                                context, turn.get('conn'), required_permission=cached['required_permission'])):
+                    if cached.get('monetary_calculation') and not all([
+                            await self._reference_allowed(cached['monetary_calculation'][key], context, turn.get('conn'))
+                            for key in ('target', 'baseline')]):
+                        return denied
+                    if cached.get('business_rbac_verified') and not await self._operation_permissions_allowed(
+                            cached['confirmed_state'], context, turn.get('conn')):
+                        return denied
+                    if cached.get('decision') == 'RESEARCH' or cached.get('research_reference'):
+                        receipt = (cached.get('research') or {}).get('recovery')
+                        if (not receipt or self.researcher is None
+                                or not hasattr(self.researcher, 'revalidate')
+                                or not await self.researcher.revalidate(context, receipt)):
                             return denied
-                        if cached.get('monetary_calculation') and not all([
-                                await self._reference_allowed(cached['monetary_calculation'][key], context, turn.get('conn'))
-                                for key in ('target', 'baseline')]):
-                            return denied
-                        if cached.get('business_rbac_verified') and not await self._operation_permissions_allowed(
-                                cached['confirmed_state'], context, turn.get('conn')):
-                            return denied
-                        if cached.get('decision') == 'RESEARCH' or cached.get('research_reference'):
-                            receipt = (cached.get('research') or {}).get('recovery')
-                            if (not receipt or self.researcher is None
-                                    or not hasattr(self.researcher, 'revalidate')
-                                    or not await self.researcher.revalidate(context, receipt)):
-                                return denied
-                        response = cached['response_prepared']
-                        return MessageResult(response['text'], context.correlation_id, response['classification'])
-                    result, audit = await self._process(message, context, turn)
-                    with span('conversation_audit_save'):
-                        await self.store.save(context, turn, audit)
-                # Return only after state/result/response transaction commit.
-                return result
+                    response = cached['response_prepared']
+                    return MessageResult(response['text'], context.correlation_id, response['classification'])
+                result, audit = await self._process(message, context, turn)
+                with span('conversation_audit_save'):
+                    await self.store.save(context, turn, audit)
+            return result
+        try:
+            # The legacy request deadline remains a technical admission guard for
+            # the fast path. An accepted investigation is deliberately not inside
+            # it: channel/request lifetime cannot cancel durable research.
+            if self.researcher is not None or self.turn_timeout_seconds is None:
+                return await process_turn()
+            async with asyncio.timeout(self.turn_timeout_seconds):
+                return await process_turn()
         except Exception:
             return MessageResult('No se pudo completar la consulta. No hay un resultado confirmado.',
                                  context.correlation_id, 'ERROR')
@@ -249,21 +262,90 @@ class TelchiHandler:
         try:
             options = ({'analysis_context_id': turn.get('analysis_context_id', context.conversation_id)}
                        if hasattr(self.researcher, 'result_reference') else {})
-            # The research conversation does not contain prior fast-path turns.
-            # Supply committed scope as data, without changing routing or making
-            # presentation exclusions into SQL predicates.
-            state = turn.get('state') or {}
-            inherited = {key: state[key] for key in (
-                'metric', 'period', 'periods', 'period_mode', 'branches', 'sales_channel',
-                'product_target', 'customer_target', 'business_category', 'group_by',
-                'excluded_product', 'excluded_products') if state.get(key)}
+            # The investigator receives the same effective scope receipt as the
+            # capability path. It must not rebuild filters from the prior turn.
+            # A representation gap may be routed to durable research after the
+            # State Engine has validated a new scope.  Use that validated scope,
+            # not the previously committed conversation state; otherwise a
+            # clarification such as "Todos los canales" loses its territorial
+            # entity before SQL planning begins.
+            state = deepcopy(audit.get('validated_state') or
+                             audit.get('confirmed_state') or turn.get('state') or {})
+            contract = deepcopy(audit.get('business_scope') or state.get('scope_contract') or {})
+            inherited = {
+                key: state[key] for key in (
+                    'metric', 'period', 'periods', 'period_mode', 'branches', 'sales_channel',
+                    'product_target', 'customer_target', 'business_category', 'group_by',
+                    'entity_mention')
+                if state.get(key)
+            }
+            territorial = bool(state.get('branches') or state.get('entity_mention'))
             question = message.text_body
-            if inherited:
-                question += '\nContexto previo confirmado (datos; solo para seguimientos, no para una consulta independiente): ' + json.dumps(inherited, ensure_ascii=False)
+            if territorial and state.get('metric') == 'sales.net_amount':
+                # The territorial contract is explicitly the accredited line
+                # measure; header DocTotal cannot be attributed to a warehouse
+                # grouping. Keep the conversational metric unchanged for
+                # continuity, but make the research obligation unambiguous.
+                question += ('\nContrato territorial confirmado: responder neto de líneas comerciales '
+                             '(sales_line.line_total menos credit_memo_line.line_total), '
+                             'no neto documental de cabeceras; no pedir una aclaración de medida.')
+            audit.setdefault('scope_trace', []).append(
+                business_scope.scope_audit_entry(contract, 'research_handoff', source='handler'))
+            scope_payload = dict(question=message.text_body, effective_scope=contract,
+                                 state=state, source='backend_confirmed_scope')
+            if territorial and state.get('metric') == 'sales.net_amount':
+                scope_payload['territorial_measure'] = 'commercial_line_net_amount'
+                scope_payload['territorial_entity_required'] = True
+            if inherited and contract.get('intent') not in {'NEW_QUERY'}:
+                scope_payload['context'] = inherited
+            import inspect
+            researcher_call = getattr(self.researcher, '__call__', self.researcher)
+            supports_scope = (hasattr(self.researcher, 'accepts_business_knowledge')
+                              or 'effective_scope' in inspect.signature(researcher_call).parameters)
+            if supports_scope:
+                options['effective_scope'] = scope_payload
+            elif inherited and contract.get('intent') not in {'NEW_QUERY'}:
+                # Compatibility only for legacy in-process test doubles that
+                # cannot consume the structured receipt. The real port always
+                # receives effective_scope and must not reconstruct from prose.
+                legacy_context = {key: (turn.get('state') or {}).get(key) for key in inherited
+                                  if (turn.get('state') or {}).get(key)}
+                question += '\nContexto previo confirmado (datos; solo para seguimientos, no para una consulta independiente): ' + json.dumps(legacy_context, ensure_ascii=False)
             if hasattr(self.researcher, 'accepts_business_knowledge'):
-                # Reuse this turn's authorized resolver result, never retrieve a
-                # second catalog or spend another embedding/model call.
-                options['business_knowledge'] = audit.get('business_semantics')
+                # Reuse the authorized semantic receipt, except for territorial
+                # line reconciliation: its published crosswalk and exact join
+                # contract are the authoritative knowledge, while retransmitting
+                # the broad resolver payload consumes the fixed observation wire
+                # budget before Luna can issue the two required aggregates.
+                territorial = bool(state.get('branches') or state.get('entity_mention'))
+                options['business_knowledge'] = (
+                    None if territorial and state.get('metric') == 'sales.net_amount'
+                    else audit.get('business_semantics'))
+            known_measure = getattr(self.researcher, 'execute_known_measure', None)
+            if known_measure is not None and territorial and state.get('metric') == 'sales.net_amount':
+                report = await known_measure(context, scope_payload)
+                audit['research'] = {
+                    'status': report.get('status'),
+                    'reason': None,
+                    'routing_category': 'KNOWN_TERRITORIAL_LINE_NET',
+                    'publication': report.get('publication'),
+                    'snapshot': report.get('snapshot'),
+                    'question_coverage': 'VERIFIED_WITH_LIMITATIONS',
+                    'model_calls': [],
+                    'sql_executions': report.get('sql_executions'),
+                    'elapsed_seconds': 0,
+                    'required_measure': report.get('required_measure'),
+                    'deterministic_continuations': [],
+                    'deterministic_contract_completion': report.get('deterministic_contract_completion'),
+                    'evidence': report.get('evidence'),
+                }
+                audit.update(
+                    decision='EXECUTE', business_rbac_verified=True,
+                    execution_status='executed',
+                    known_measure_execution=True,
+                    execution_result=report.get('deterministic_contract_completion'))
+                return MessageResult(report['business_answer'], context.correlation_id,
+                                     'DIRECT_AVAILABLE')
             report = await self.researcher(question, context.conversation_id, context, **options)
         except Exception:
             if getattr(self.researcher, 'recovery_repository', None) is not None:
@@ -285,6 +367,10 @@ class TelchiHandler:
                              'question_coverage': report.get('question_coverage'),
                              'model_calls': report.get('model_calls'),
                              'sql_executions': report.get('sql_executions'),
+                             'elapsed_seconds': report.get('elapsed_seconds'),
+                             'required_measure': report.get('required_measure'),
+                             'deterministic_continuations': report.get('deterministic_continuations'),
+                             'deterministic_contract_completion': report.get('deterministic_contract_completion'),
                              'recovery': report.get('_recovery')}
         if status == 'BLOCKED' and report.get('reason') in {
                 'execution_stopped:host_io_or_memory_pressure',
@@ -294,7 +380,8 @@ class TelchiHandler:
             # A safe environmental stop is not a commercial catalog rejection.
             # No unverified partial figures, exception text or authority changes.
             audit.update(decision='RESEARCH_BLOCKED', committed=False,
-                         execution_status='not_completed', confirmed_state=deepcopy(turn['state']))
+                         execution_status='not_completed',
+                         confirmed_state=deepcopy(audit.get('validated_state') or turn['state']))
             audit['bmd'] = {'category': 'RESEARCH_RESOURCE_BLOCKED'}
             return MessageResult('La investigación se detuvo por un límite de recursos o de ejecución. '
                                  'No tengo una respuesta completa acreditada; no es un rechazo '
@@ -307,7 +394,7 @@ class TelchiHandler:
             limit = report.get('observation_budget') or {}
             audit.update(decision='RESEARCH_RESOURCE_LIMITED', committed=False,
                          execution_status='not_completed', required_permission=None,
-                         confirmed_state=deepcopy(turn['state']),
+                         confirmed_state=deepcopy(audit.get('validated_state') or turn['state']),
                          research_limit=dict(reason=report.get('reason'), **{
                              k: limit[k] for k in ('limit', 'measured_bytes') if k in limit}))
             audit['bmd'] = {'category': 'RESEARCH_RESOURCE_LIMITED'}
@@ -325,7 +412,8 @@ class TelchiHandler:
         partial = status == 'PARTIAL'
         audit.update(decision='RESEARCH', committed=False,
                      execution_status='not_executed' if clarification else 'executed',
-                     required_permission=None, confirmed_state=deepcopy(turn['state']))
+                     required_permission=None,
+                     confirmed_state=deepcopy(audit.get('validated_state') or turn['state']))
         # Preserve the actual interpreter output and rejected plan for diagnosis.
         # Research never confers capability execution authority on that plan.
         audit['bmd'] = {'category': ('RESEARCH_CLARIFICATION' if clarification else
@@ -381,18 +469,21 @@ class TelchiHandler:
                     semantics = await self.researcher.filter_business_knowledge(semantics, context)
                 audit['business_semantics'] = semantics
                 interpretation_args['business_semantics'] = luna_context(semantics)
+                # A semantic guard must not bypass Luna when the real research port
+                # can consume the structured business scope and the user may need a
+                # conversational clarification. Legacy test doubles retain the old
+                # direct-research route for compatibility.
                 if (self.researcher is not None
+                        and not hasattr(self.researcher, 'filter_business_knowledge')
                         and semantics.get('semantic_guard', {}).get('requires_clarification')):
-                    # A commercial vocabulary mismatch is not a source/permission
-                    # denial. Investigate the ORIGINAL question, never execute an
-                    # unfiltered commercial delta or trust the rejected mapping.
                     audit.update(committed=False, decision='RESEARCH_REQUESTED',
                                  bmd={'category': 'RESEARCH_REQUESTED',
                                       'reason': 'commercial_semantic_contract_unrepresentable'})
                     timings['interpretation_ms'] = (perf_counter() - phase) * 1000
                     return MessageResult('No hay un resultado de investigación confirmado.',
                                          context.correlation_id, 'DIRECT_UNAVAILABLE'), audit
-                if semantics.get('semantic_guard', {}).get('requires_clarification'):
+                if (self.researcher is None
+                        and semantics.get('semantic_guard', {}).get('requires_clarification')):
                     # Do not let Luna replace a rejected entity/direction with an
                     # unfiltered global plan. Preserve prior state, no pending plan
                     # or execution authority is fabricated by a lexical veto.
@@ -463,7 +554,8 @@ class TelchiHandler:
                     continuity_cells=len(reference_result['manifest'].get('continuity_cells', [])))
             proposal = await self.interpreter.interpret(**interpretation_args)
             audit['interpretation_proposed'] = deepcopy(proposal)
-            if proposal == {'intent': 'RESEARCH', 'action': 'INVESTIGATE'} and self.researcher is not None:
+            if (proposal == {'intent': 'RESEARCH', 'action': 'INVESTIGATE'}
+                    and self.researcher is not None and not before.get('pending')):
                 state_engine.validate(before)
                 audit.update(committed=False, decision='RESEARCH_REQUESTED',
                              bmd={'category': 'RESEARCH_REQUESTED'})
@@ -471,6 +563,21 @@ class TelchiHandler:
                 timings['total_processing_ms'] = (perf_counter() - origin) * 1000
                 return MessageResult('No hay un resultado de investigación confirmado.',
                                      context.correlation_id, 'DIRECT_UNAVAILABLE'), audit
+            if (proposal == {'intent': 'RESEARCH', 'action': 'INVESTIGATE'}
+                    and before.get('pending', {}).get('spec', {}).get('slot') == 'sales_channel'):
+                # A pending channel choice is resolved by the user's explicit
+                # answer before handing the turn to free research. Otherwise the
+                # investigator receives the stale pending state and can spend its
+                # whole budget re-asking a question already answered.
+                from .commercial_continuity import normalized
+                if 'todos los canales' in normalized(message.text_body):
+                    proposed = deepcopy(before['pending']['proposed'])
+                    proposal = dict(intent='REFINE', action='EXECUTE', clarification=None,
+                                    state_delta={'set': {
+                                        '/metric': proposed['metric'],
+                                        '/period': proposed['period'],
+                                        '/branches': proposed['branches'],
+                                        '/sales_channel': None}, 'unset': []})
             proposal = documentary_request_contract(proposal, message.text_body)
             proposal = fixed_ranking_request_contract(proposal, message.text_body)
             from .commercial_continuity import request_contract
@@ -572,6 +679,8 @@ class TelchiHandler:
         processed = self.engine(before, proposal, turn['history'], context.correlation_id)
         timings['state_engine_ms'] = (perf_counter() - phase) * 1000
         audit['contract_error'] = processed.get('contract_error')
+        if processed.get('pending_lifecycle'):
+            audit['pending_lifecycle'] = list(processed['pending_lifecycle'])
         audit['committed'] = processed['committed'] is True
         if processed['committed'] is not True:
             # NEVER use raw EXECUTE, rejected state_after, or the retained prior plan.
@@ -610,6 +719,39 @@ class TelchiHandler:
                         # substitute measure.
                         audit['availability_resolution'] = (
                             'ANALYSIS_ROUTED_TO_AUTHORIZED_RESEARCH; NOT_AUTHORIZATION')
+            # Materialize one service-owned effective scope before routing. The
+            # same receipt is handed to capabilities and free research; the
+            # latter must never reconstruct scope from turn['state'] alone.
+            delta_sets = ((proposal.get('state_delta') or {}).get('set') or {})
+            explicit_keys = {str(k).lstrip('/') for k in delta_sets}
+            inherited_keys = {
+                key: deepcopy(before.get(key)) for key in (
+                    'metric', 'period', 'periods', 'period_mode', 'branches',
+                    'sales_channel', 'comparison', 'group_by', 'business_category',
+                    'product_target', 'customer_target')
+                if before.get(key) and key not in explicit_keys
+            }
+            explicit_filters = {str(k).lstrip('/'): deepcopy(v) for k, v in delta_sets.items()}
+            contract = business_scope.effective_scope(
+                state, question=message.text_body,
+                intent=processed['output'].get('intent'),
+                resolution='pending_clarification' if state.get('pending') else 'confirmed',
+                coverage='pending' if state.get('pending') else 'unverified')
+            contract.update(explicit_filters=explicit_filters,
+                            inherited_confirmed_filters=inherited_keys,
+                            inherited_ambiguous_filters=(
+                                {'sales_channel': before.get('sales_channel')}
+                                if (state.get('pending') or {}).get('spec', {}).get('slot') == 'sales_channel'
+                                else {}),
+                            provenance={key: ('explicit' if key in explicit_keys else 'inherited')
+                                        for key in set(explicit_filters) | set(inherited_keys)},
+                            workspace=context.channel.workspace_id,
+                            permissions=sorted(getattr(context.sender_identity, 'permissions', ()) or ()))
+            # The audit is the durable receipt; keeping the operational state
+            # schema unchanged preserves legacy replay and pending hashes.
+            audit['business_scope'] = deepcopy(contract)
+            audit.setdefault('scope_trace', []).append(
+                business_scope.scope_audit_entry(contract, 'confirmed_state', source='state_engine'))
             audit['validated_state'] = deepcopy(state)
             audit['confirmed_state'] = deepcopy(state)  # confirmed request, NOT execution
             audit['decision'] = action

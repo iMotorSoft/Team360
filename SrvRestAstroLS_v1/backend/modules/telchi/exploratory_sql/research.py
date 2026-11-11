@@ -143,11 +143,11 @@ def proposal_from(value):
         candidate_relations=tuple(CandidateRelation(**r) for r in relations))
 
 
-async def investigate(luna, *, question=DEFAULT_QUESTION, wall_seconds=180):
-    """Bounded controller; model only proposes SQL or a final answer.
+async def investigate(luna, *, question=DEFAULT_QUESTION, wall_seconds=None):
+    """Durable controller; model only proposes SQL or a final answer.
 
-    Wall budget includes API calls. SQL execution budget starts after the first
-    model call; model latency is not misreported as DuckDB execution time.
+    Provider-call deadlines and query/resource guards remain technical
+    protections. Elapsed investigation time is observed, never terminal.
     """
     started = time.monotonic()
     report = dict(identifier="TELCHIAI_EXPLORATORY_SQL_DIRECT_READONLY_V1",
@@ -160,15 +160,12 @@ async def investigate(luna, *, question=DEFAULT_QUESTION, wall_seconds=180):
     context = synthetic_context()
     try:
         for _ in range(7):
-            remaining = wall_seconds - (time.monotonic() - started)
-            if remaining <= 0:
-                raise RuntimeError("research_wall_budget_exhausted")
             payload = dict(question=question, catalog=asdict(CATALOG), observations=history,
                            successful_queries=len(completed), remaining_calls=7-len(report["turns"]))
             # Observation and aggregate input ceiling, including catalog/history.
             if len(canonical(payload).encode()) > 32768:
                 raise RuntimeError("model_observation_budget_exhausted")
-            value = await asyncio.wait_for(luna.next(payload, timeout=min(45, remaining)), remaining)
+            value = await asyncio.wait_for(luna.next(payload, timeout=45), 45)
             if value.get("action") == "final":
                 if len(completed) < 2:
                     history.append({"decision": "BLOCKED", "reason": "two_distinct_observed_queries_required"})
@@ -238,7 +235,7 @@ async def investigate(luna, *, question=DEFAULT_QUESTION, wall_seconds=180):
         report["model_calls"] = luna.calls
         report["resources"] = dict(peak_process_rss_kib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
                                    duckdb_threads=1, concurrency=1, observation_bytes_limit=32768,
-                                   wall_budget_seconds=wall_seconds, own_processes_left_running=0)
+                                   wall_budget_seconds=None, own_processes_left_running=0)
     return report
 
 

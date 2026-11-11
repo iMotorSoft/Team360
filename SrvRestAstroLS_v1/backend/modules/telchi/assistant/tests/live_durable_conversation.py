@@ -26,10 +26,19 @@ from modules.telchi.assistant import whatsapp_dev as dev, whatsapp_dev_lifecycle
 from modules.telchi.assistant.handler import BusinessPolicy, BusinessAuthorization, PostgresConversationStore, TelchiHandler, registration
 from modules.telchi.assistant.capabilities import SalesCapabilities
 from modules.telchi.assistant.conversation_controls import OPTIONS
+from modules.telchi.console_http import load_config
+from modules.telchi.research_port import build_researcher
 from .live_operational_authorized import QUESTIONS
 
-TURNS = [QUESTIONS[2], 'Continuar', '¿Y cuáles fueron los cinco principales proveedores?',
-         'Nueva consulta', QUESTIONS[0], QUESTIONS[1], QUESTIONS[3], QUESTIONS[4]]
+# This runner is the durable Telchi contract probe, not the unrelated operational
+# question battery. Keep the business conversation explicit so a successful run
+# proves acceptance, clarification, follow-up scope and period continuity.
+TURNS = [
+    '¿Cuánto vendimos por horizontal en septiembre de 2026?',
+    '¿Cuánto vendió el Segundo Anillo en octubre de 2026?',
+    'Todos los canales',
+    '¿Y en septiembre?',
+]
 
 
 async def run(output, max_turns):
@@ -64,8 +73,11 @@ async def run(output, max_turns):
     try:
         channel = ChannelContext(binding.channel_id,binding.provider,binding.provider_instance,
             binding.receiver_context,binding.tenant_id,binding.workspace_id,binding.module,binding.environment)
+        researcher = build_researcher(pool=pool, config=load_config())
+        if researcher is None:
+            raise RuntimeError('authenticated_researcher_not_enabled')
         handler = TelchiHandler(store=PostgresConversationStore(pool), authorization=BusinessAuthorization(policy),
-            capabilities=SalesCapabilities(timeout_seconds=180),turn_timeout_seconds=300)
+            capabilities=SalesCapabilities(timeout_seconds=180), researcher=researcher, turn_timeout_seconds=300)
         if not report['turns']:
             from modules.telchi.assistant.state_engine import EMPTY
             await handler.interpreter.interpret(text='¿Cuánto facturamos?',state=EMPTY,history={},
@@ -105,7 +117,10 @@ async def run(output, max_turns):
                 decision=audit.get('decision'),execution_status=audit.get('execution_status'),
                 capability_calls=audit.get('capability_calls'),analysis_context_id=audit.get('analysis_context_id'),
                 confirmed_state=audit.get('confirmed_state'),model=handler.interpreter.last_metadata,
+                response=response,
                 response_sha256=hashlib.sha256(response.encode()).hexdigest(),response_length=len(response),
+                research_detail=audit.get('research'), research_limit=audit.get('research_limit'),
+                scope_trace=audit.get('scope_trace'), business_scope=audit.get('business_scope'),
                 options=response.endswith(OPTIONS),job=inbound['payload_jsonb']['durable_job'],
                 outbound_status=outbound[0]['status'],transport_status=outbound[0]['transport_status'])
             report['turns'].append(result)

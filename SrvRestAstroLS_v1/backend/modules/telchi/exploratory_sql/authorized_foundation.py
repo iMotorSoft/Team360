@@ -9,7 +9,8 @@ import re
 import weakref
 
 from .contracts import (AuthorizedExecutionContext, Budget, Catalog, Column,
-                        LogicalTable, Decision, ExploratoryQueryResult, SecurityDecision)
+                        LogicalTable, CandidateRelation, Decision,
+                        ExploratoryQueryResult, SecurityDecision)
 from .executor import ResearchBudget
 from .foundation import FoundationReadonlyExecutor
 from .validator import Rejected, context_digest, identifier
@@ -80,6 +81,17 @@ def discover(db, access, *, allowed_sources=None):
                         continue
                     physical = str(access.reference(path.name)).replace("'", "''")
                     candidates.append((name, f"read_parquet('{physical}')"))
+            # Crosswalks are a separate authorized relation.  Do not infer or
+            # expose them from a reference policy: the exact SourcePolicy source
+            # must be present in the live binding.
+            if (allowed_sources is not None
+                    and 'warehouse_business_location' in allowed_sources):
+                try:
+                    physical = str(access.crosswalk('warehouse_business_location')).replace("'", "''")
+                    candidates.append(('warehouse_business_location',
+                        f"read_parquet('{physical}')"))
+                except (FoundationReaderError, OSError, AttributeError):
+                    gaps.append('reference:warehouse_business_location:unsupported_reader_contract')
             continue
         names = set(_COMPONENT_TABLES.get(component, ())) | set(datasets)
         if not names and allowed_sources is None:
@@ -299,7 +311,43 @@ def enrich_authorized_sales_lines(db, sources, policies, scope):
             'with checked key uniqueness; unmatched rows retain NULL dimensions. '
             'Filter canceled=N, source_table=INV1 and currency explicitly. '
             'line_total remains commercial line money BEFORE credit memos, not net billing.',))
-    return tuple(enriched if s.name == line.name else s for s in sources), ()
+    result = tuple(enriched if s.name == line.name else s for s in sources)
+    # Credit-memo line reconciliation uses the same line grain, but the
+    # published line contract carries its document date on the header. Project
+    # that existing many-to-one dimension onto credit_memo_line so the
+    # investigator can apply the identical [start,end), status and currency
+    # predicates without falling back to header DocTotal.
+    credit_line = by_name.get('credit_memo_line')
+    credit_doc = by_name.get('credit_memo_document')
+    credit_names = {'credit_memo_line', 'credit_memo_document'}
+    credit_approved = {p.source for p in policies if p.source in credit_names and p.whole_dataset
+                      and p.columns is None and p.organization == scope.organization
+                      and p.workspace == scope.workspace and p.permission in scope.permissions}
+    if credit_line and credit_doc and credit_approved == credit_names:
+        lc, dc = {c.name for c in credit_line.columns}, {c.name for c in credit_doc.columns}
+        required_credit = {'doc_entry', 'source_system', 'source_table', 'line_total', 'whs_code'}
+        required_doc = {'doc_entry', 'source_system', 'source_table', 'doc_date', 'canceled', 'currency'}
+        if required_credit <= lc and required_doc <= dc and 'doc_date' not in lc:
+            doc_relation = (f"(SELECT * FROM {credit_doc.relation} WHERE "
+                            "source_system='SAP_B1_HANA' AND source_table='ORIN')")
+            credit_relation = (f"(SELECT l.*,CAST(d.doc_date AS DATE) AS doc_date,d.canceled AS doc_canceled,"
+                               f"d.currency AS doc_currency FROM {credit_line.relation} l "
+                               f"LEFT JOIN {doc_relation} d ON l.doc_entry=d.doc_entry "
+                               "AND l.source_system=d.source_system AND l.source_table='RIN1')")
+            credit = replace(credit_line, relation=credit_relation,
+                columns=credit_line.columns + (Column('doc_date', 'DATE', True),
+                                               Column('doc_canceled', 'VARCHAR', True),
+                                               Column('doc_currency', 'VARCHAR', True)),
+                projection_contracts=credit_line.projection_contracts + (dict(
+                    origin='enrich_authorized_sales_lines', version='credit_memo_line_doc_date_v1',
+                    sources=['credit_memo_line', 'credit_memo_document'],
+                    authority='CHECKED_BACKEND_PROJECTION_ONLY',
+                    relationships=['credit_memo_line.doc_entry + source_system -> credit_memo_document'],
+                    measure='line_total unchanged; never sum credit_memo_document.doc_total',
+                    grain='Original credit memo line counted once'),),
+                limitations=credit_line.limitations + ('Credit memo document date/status/currency are projected from a checked many-to-one ORIN header; line_total remains the measure.',))
+            result = tuple(credit if s.name == credit_line.name else s for s in result)
+    return result, ()
 
 
 def published_file_relation(access, component, dataset):
@@ -496,8 +544,20 @@ class ResearchBinding:
             if t.name in full_sources and set(receipt['sources']) <= full_sources))
             for t in selected]
         self.projections = MappingProxyType(projections)
+        known_relations = ()
+        names = {table.name for table in selected}
+        mapping_columns = {c.name for table in selected if table.name == 'warehouse_business_location' for c in table.columns}
+        relations = []
+        for line_name in ('sales_line', 'credit_memo_line'):
+            line_columns = {c.name for table in selected if table.name == line_name for c in table.columns}
+            if line_name in names and 'whs_code' in line_columns and 'warehouse_code' in mapping_columns:
+                relations.append(CandidateRelation(
+                    line_name, 'whs_code', 'warehouse_business_location', 'warehouse_code',
+                    'Published warehouse-to-business-location crosswalk; one mapping row per source warehouse.'))
+        if relations:
+            known_relations = tuple(relations)
         catalog = Catalog('telchi_authorized_foundation_dev_v1', scope.organization,
-                          scope.workspace, publication, str(snapshot), tuple(selected), (), False)
+                          scope.workspace, publication, str(snapshot), tuple(selected), known_relations, False)
         self.context = AuthorizedExecutionContext(scope.user_id, scope.organization,
             scope.workspace, 'dev', scope.permissions, catalog, tuple(projections), publication,
             str(snapshot), budget or Budget(), investigation_id)
@@ -591,6 +651,54 @@ class AuthorizedFoundationExecutor(FoundationReadonlyExecutor):
             publication=context.publication, snapshot=context.snapshot)
 
 
+def describe_authorized_territorial_mapping(db, sources, policies, scope):
+    """Expose the published location vocabulary and join contract, if authorized.
+
+    This is metadata over the same sealed crosswalk, not a new grant or a row
+    policy. Unknown mappings remain visible as unknown; investigators must use
+    the validated/business-confirmed predicates for an accredited grouping.
+    """
+    from .validator import canonical
+    source = next((s for s in sources if s.name == 'warehouse_business_location'), None)
+    if source is None:
+        return tuple(sources), ()
+    matches = [p for p in policies if p.source == source.name and p.whole_dataset
+               and p.organization == scope.organization and p.workspace == scope.workspace
+               and p.permission in scope.permissions
+               and (p.columns is None or {'warehouse_code', 'business_location_code',
+                   'business_location_name', 'mapping_status', 'mapping_source'} <= set(p.columns))]
+    required = {'warehouse_code', 'business_location_code', 'business_location_name',
+                'mapping_status', 'mapping_source'}
+    if len(matches) != 1 or not required <= {c.name for c in source.columns}:
+        return tuple(sources), ('territorial_mapping:missing_authorized_columns',)
+    rows = db.execute(f'''SELECT business_location_code,business_location_name,
+        mapping_status,mapping_source,count(*) AS mapping_rows,
+        count(DISTINCT warehouse_code) AS warehouse_count
+        FROM {source.relation}
+        GROUP BY business_location_code,business_location_name,mapping_status,mapping_source
+        ORDER BY business_location_code,mapping_status''').fetchall()
+    metadata = canonical(dict(columns=('business_location_code', 'business_location_name',
+        'mapping_status', 'mapping_source', 'mapping_rows', 'warehouse_count'), values=rows,
+        complete=True))
+    enriched = replace(source,
+        projection_contracts=source.projection_contracts + (dict(
+            origin='describe_authorized_territorial_mapping', version='TELCHI_TERRITORIAL_BINDING_V1',
+            sources=['warehouse_business_location'], authority='PUBLISHED_REFERENCE_CROSSWALK',
+            relationships=['sales_line.whs_code = warehouse_business_location.warehouse_code',
+                           'credit_memo_line.whs_code = warehouse_business_location.warehouse_code'],
+            cardinality='warehouse mapping must be unique per source warehouse for the selected mapping status',
+            filters=["mapping_status='VALIDATED'", "mapping_source='BUSINESS_CONFIRMED'"],
+            measure='line_total on sales_line/credit_memo_line; never header doc_total',
+            grain='one commercial line counted once', checks=['validated mapping vocabulary',
+            'unknown mappings are not used as accredited entity members'],
+            limitations=['whole_dataset authorization includes unknown rows; SQL must retain the validated/business-confirmed predicate.']),),
+        limitations=source.limitations + (
+            'Published territorial vocabulary for this binding: ' + metadata,
+            "Accredited territorial membership requires mapping_status='VALIDATED' and mapping_source='BUSINESS_CONFIRMED'; unknown rows are not members.",
+            'Join sales_line.whs_code or credit_memo_line.whs_code to warehouse_code; do not join by names or prefixes.',))
+    return tuple(enriched if s.name == source.name else s for s in sources), ()
+
+
 def describe_authorized_dimensions(db, sources, policies, scope):
     """Small published vocabularies, not cached answers or row-policy bypasses.
 
@@ -639,10 +747,14 @@ def open_binding(*, reader, resolve_scope, policies, investigation_id, budget=No
     with reader.connector.session(read_only=True) as db:
         access = reader.resolve_on(db)
         sources, gaps = discover(db, access, allowed_sources=allowed_sources)
+        if 'warehouse_business_location' not in allowed_sources:
+            gaps += ('reference:warehouse_business_location:source_policy_required',)
         sources, classification_gaps = classify_authorized_products(db, sources, policies, scope)
         gaps += classification_gaps
         sources, dimension_gaps = enrich_authorized_sales_lines(db, sources, policies, scope)
         gaps += dimension_gaps
+        sources, territorial_gaps = describe_authorized_territorial_mapping(db, sources, policies, scope)
+        gaps += territorial_gaps
         sources = describe_authorized_dimensions(db, sources, policies, scope)
         binding = ResearchBinding(resolve_scope=resolve_scope, scope=scope,
             publication=access.foundation_publication_id, snapshot=access.ducklake_snapshot_id,

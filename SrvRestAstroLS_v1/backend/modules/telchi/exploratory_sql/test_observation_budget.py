@@ -86,6 +86,19 @@ def test_prior_conversation_is_bounded_with_a_marker_never_silently():
     assert compact['observations'][0]['rows']
 
 
+def test_recoverable_manifest_overhead_is_referenced_not_terminal():
+    payload = dict(question='q', catalog=dict(tables=[]), conversation=[],
+                   observations=[observation(n, columns=16) for n in range(1, 8)])
+    for entry in payload['observations']:
+        entry['evidence_manifest']['continuity_cells'] = ['repeated predicate ' * 120]
+        entry['evidence_manifest']['filter_expression'] = 'x' * 4000
+        entry['evidence_manifest']['limitations'] = ['known limitation ' * 80]
+    compact = bounded_payload(payload)
+    assert size(compact) <= OBSERVATION_BUDGET
+    assert compact['evidence_recovery']['status'] == 'PERSISTED_FULL_EVIDENCE_AVAILABLE'
+    assert all(entry['rows'] for entry in compact['observations'])
+
+
 def test_an_unrecoverable_payload_reports_the_measured_cause():
     payload = dict(question='q' * 40000, catalog=dict(tables=[]), conversation=[],
                    observations=[observation(1)])
@@ -95,6 +108,21 @@ def test_an_unrecoverable_payload_reports_the_measured_cause():
     assert stats['stages']['input'] > OBSERVATION_BUDGET
     assert stats['components']['question'] == size(payload['question'])
     assert stats['components']['observations'] > 0
+
+
+def test_already_compact_discovery_catalog_is_idempotent():
+    payload = dict(
+        question='q', conversation=[],
+        catalog={'tables': [
+            {'name': f'table_{index}', 'grain': 'aggregate',
+             'columns': {f'amount_{index}': 0, f'date_{index}': 1},
+             'semantic_constraints': [0]}
+            for index in range(220)
+        ]},
+        observations=[observation(1, columns=12)])
+    compact = bounded_payload(payload)
+    assert size(compact) <= OBSERVATION_BUDGET
+    assert compact['catalog']['tables'][0]['columns']['amount_0'] == 0
 
 
 def test_budget_is_never_expanded_and_input_is_not_mutated():

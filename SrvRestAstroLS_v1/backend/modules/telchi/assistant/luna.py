@@ -617,6 +617,11 @@ observaciones autorizadas; no escribas SQL aquí. No es otro servicio ni un perm
 Esto prevalece sobre las instrucciones de indisponibilidad por límites del catálogo.
 Una aclaración empresarial genuina sigue siendo ASK; referencias y cálculos locales
 sobre resultados acreditados conservan sus contratos existentes y evitan repetir SQL.
+Si la pregunta introduce una entidad o dimensión nueva mientras el estado confirmado
+contiene un filtro material (por ejemplo, un canal), no investigues todavía: emití ASK
+con una pregunta breve sobre si ese filtro anterior se mantiene. Conservá en la propuesta
+pendiente la entidad, el período y la medida solicitados; la respuesta de aclaración
+resolverá únicamente el filtro ambiguo.
 Nunca uses investigación para evadir una denegación, inventar fuentes, cifras,
 clasificaciones, unidades o significados no acreditados.
 """

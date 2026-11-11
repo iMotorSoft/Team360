@@ -89,7 +89,8 @@ class ConsoleResearchService:
 
     async def ask_scope(self, scope_resolver, question, save, *,
                         progress=lambda event: None, conversation_id='default',
-                        recovery=None, checkpoint=None, business_knowledge=None):
+                        recovery=None, checkpoint=None, business_knowledge=None,
+                        effective_scope=None):
         """Same investigator for ANY already-authenticated channel.
 
         scope_resolver is an async callable returning a fresh EffectiveScope. It is
@@ -157,7 +158,8 @@ class ConsoleResearchService:
                     if previous:
                         session.history = list(previous[1])
                         session.required_measure = previous[2]
-                    report = asyncio.run(session.ask(question, save, executor_factory=executor))
+                    report = asyncio.run(session.ask(question, save, executor_factory=executor,
+                                                      effective_scope=effective_scope))
                     binding.present(report, binding.context)
                     report['reader_contract_gaps'] = gaps
                     conversation_state.extend((list(session.history), session.required_measure))

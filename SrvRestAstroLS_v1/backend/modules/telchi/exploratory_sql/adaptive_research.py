@@ -172,7 +172,7 @@ def payload_sizes(payload):
     return sizes
 
 
-def bounded_payload(payload, stats=None):
+def bounded_payload(payload, stats=None, *, wire_budget=None):
     """Compact prior samples, never expand the budget or hide truncation.
 
     `stats` (optional) receives the measured size of every compaction stage and
@@ -182,18 +182,32 @@ def bounded_payload(payload, stats=None):
     import copy
     compact = copy.deepcopy(payload)
     record = stats if stats is not None else {}
-    record['limit'] = OBSERVATION_BUDGET
+    wire_limit = wire_budget or OBSERVATION_BUDGET
+    record['limit'] = wire_limit
     sizes = lambda: len(canonical(compact).encode())
 
     def checkpoint(stage):
         record.setdefault('stages', {})[stage] = sizes()
 
     checkpoint('input')
+    # The effective scope is already the durable conversational context for a
+    # territorial reconciliation. Do not retransmit prior research prose; it is
+    # audit-only and can crowd out the current mapping/line evidence.
+    scope_state = (compact.get('effective_scope') or {}).get('state') or {}
+    if scope_state.get('branches') or scope_state.get('entity_mention'):
+        compact.pop('conversation', None)
+        compact.pop('business_knowledge', None)
+        checkpoint('territorial_context_compacted')
     if sizes() > OBSERVATION_BUDGET:
         record['components'] = payload_sizes(payload)
-    if len(canonical(compact).encode()) > 32768 and 'catalog' in compact:
-        # Discovery can expose many published schemas. Compact redundant field
-        # labels only; do not drop sources, columns, types or semantic limits.
+    if (len(canonical(compact).encode()) > wire_limit and 'catalog' in compact
+            and any(isinstance(c, dict) for t in compact['catalog'].get('tables', [])
+                    for c in (t.get('columns') or []))):
+        # Discovery may already have emitted the lossless compact column mapping.
+        # Do not treat its dictionary keys as column records on the next payload
+        # pass: that was the TypeError behind durable dispatch_uncommitted.
+        # Compact redundant field labels only; do not drop sources, columns, types
+        # or semantic limits.
         catalog = compact['catalog']
         types = sorted({c['sql_type'] for t in catalog['tables'] for c in t['columns']})
         constraints = sorted({s for t in catalog['tables'] for s in t['semantic_constraints']})
@@ -204,7 +218,7 @@ def bounded_payload(payload, stats=None):
         catalog['column_type_dictionary'] = types
         catalog['semantic_constraint_dictionary'] = constraints
         compact['compact_catalog_protocol'] = 'Column types and constraints are zero-based dictionary indices.'
-        if len(canonical(compact).encode()) > 32768:
+        if len(canonical(compact).encode()) > wire_limit:
             # Published sources share many columns. Intern the complete
             # (name, type-index) pair; keep every table's membership and order.
             columns = sorted({(name, kind) for table in catalog['tables']
@@ -219,7 +233,7 @@ def bounded_payload(payload, stats=None):
     for observation in compact['observations']:
         if observation.get('evidence_manifest'):
             observation.pop('schema', None)  # schema is already in the manifest
-    if len(canonical(compact).encode()) > 32768:
+    if len(canonical(compact).encode()) > wire_limit:
         descriptors = {}
         for observation in compact['observations']:
             manifest = observation.get('evidence_manifest')
@@ -231,7 +245,7 @@ def bounded_payload(payload, stats=None):
             manifest['limitations'] = tuple(limit for limit in manifest.get('limitations', ()) if limit not in LIMITS)
         compact['evidence_columns'] = descriptors
         compact['compact_evidence_protocol'] = True
-    if len(canonical(compact).encode()) > 32768:
+    if len(canonical(compact).encode()) > wire_limit:
         # Feedback is persisted in full by the controller. On the wire its
         # column description can reference the very same issued manifest. Never
         # remove a discrepancy, observed value, dependency or required action.
@@ -255,7 +269,7 @@ def bounded_payload(payload, stats=None):
                 'evidence_columns values follow evidence_column_fields. '
                 'column_ref resolves there; column_alias is presentation only.')
     for observation in compact['observations']:
-        if len(canonical(compact).encode()) <= 32768:
+        if len(canonical(compact).encode()) <= wire_limit:
             break
         rows = observation.get('rows', ())
         if len(rows) > 3 and observation.get('evidence_manifest'):
@@ -264,7 +278,7 @@ def bounded_payload(payload, stats=None):
             observation['truncated'] = True
             observation['history_compacted'] = True
     checkpoint('evidence_compacted')
-    if len(canonical(compact).encode()) > 32768:
+    if len(canonical(compact).encode()) > wire_limit:
         for observation in compact['observations']:
             if not observation.get('evidence_manifest'): continue
             # Model-authored rationale is already audited; it is not evidence.
@@ -273,7 +287,7 @@ def bounded_payload(payload, stats=None):
             if observation.get('decision', {}).get('decision') == 'ALLOW':
                 observation['decision'] = {'decision': 'ALLOW'}
     checkpoint('rationale_compacted')
-    if len(canonical(compact).encode()) > 32768:
+    if len(canonical(compact).encode()) > wire_limit:
         # Controller feedback is guidance that the audit already persists; it is
         # not an operand, a population or a column. Only those entries leave the
         # wire, and the omission is declared with its count.
@@ -293,7 +307,7 @@ def bounded_payload(payload, stats=None):
                 ' Controller feedback entries (already persisted in the audit, never evidence) '
                 'are summarized by omitted_feedback_entries.').strip()
             checkpoint('feedback_summarized')
-    if len(canonical(compact).encode()) > 32768:
+    if len(canonical(compact).encode()) > wire_limit:
         # Prior conversation prose is context, not evidence: bound it explicitly
         # so the current question and every observation stay intact.
         conversation = compact.get('conversation') or []
@@ -309,7 +323,27 @@ def bounded_payload(payload, stats=None):
             compact['conversation'] = bounded
             compact['conversation_bounded'] = True
             checkpoint('conversation_bounded')
-    if len(canonical(compact).encode()) > 32768:
+    if len(canonical(compact).encode()) > wire_limit:
+        # The complete manifest remains in the durable evidence registry/report.
+        # On-wire repetition is transport overhead, not business evidence. Keep
+        # the issued identifiers and observed cells, and publish a recovery
+        # handle for metadata that the controller can recover from persistence.
+        omitted = []
+        for observation in compact.get('observations', ()):
+            manifest = observation.get('evidence_manifest') or {}
+            for field in ('continuity_cells', 'filter_expression', 'limitations'):
+                if field in manifest:
+                    omitted.append(dict(turn=observation.get('turn'), field=field,
+                                        result_id=manifest.get('result_id')))
+                    manifest.pop(field, None)
+        if omitted:
+            compact['evidence_recovery'] = {
+                'status': 'PERSISTED_FULL_EVIDENCE_AVAILABLE',
+                'omitted_manifest_fields': omitted,
+                'instruction': 'Use issued result/column/row handles; full manifests remain controller-owned and recoverable.',
+            }
+            checkpoint('persisted_evidence_referenced')
+    if len(canonical(compact).encode()) > wire_limit:
         raise RuntimeError('observation_byte_budget')
     checkpoint('delivered')
     return compact
@@ -331,13 +365,27 @@ def discovery_catalog(catalog, sources):
     value['source_column_dictionary'] = names
     value['source_index'] = [dict(name=t.name, grain=t.grain, permission=t.permission,
         columns=[indices[c.name] for c in t.columns]) for t in catalog.tables]
-    if len(canonical(value['source_index']).encode()) + len(canonical(names).encode()) > 16384:
-        # Unusually wide/unique schemas still need discovery headroom. Retain
-        # every source and its access family; full columns remain discoverable.
+    if len(canonical(value['source_index']).encode()) + len(canonical(names).encode()) > 8000:
+        # Large authorized catalogs need discovery headroom. Retain every source
+        # and its access family; full columns remain discoverable on demand via
+        # the existing discover action rather than consuming the observation
+        # budget before Luna can select a source.
         value.pop('source_column_dictionary')
         for item in value['source_index']:
             item['column_count'] = len(item.pop('columns'))
     value['tables'] = [asdict(t) for t in catalog.tables if t.name in sources]
+    # Keep selected schemas exact for small discoveries; large mixed discoveries
+    # use the same lossless dictionaries as bounded_payload so evidence and the
+    # source index can coexist under the fixed 32 KiB wire budget.
+    if len(canonical(value).encode()) > 12000 and value['tables']:
+        types = sorted({c['sql_type'] for t in value['tables'] for c in t['columns']})
+        constraints = sorted({s for t in value['tables'] for s in t['semantic_constraints']})
+        for table in value['tables']:
+            table['columns'] = {c['name']: types.index(c['sql_type']) for c in table['columns']}
+            table['semantic_constraints'] = [constraints.index(s) for s in table['semantic_constraints']]
+        value['column_type_dictionary'] = types
+        value['semantic_constraint_dictionary'] = constraints
+        value['compact_catalog_protocol'] = 'Selected table columns and constraints use zero-based dictionaries; exact names remain keys.'
     value['discovery_protocol'] = (
         'source_index lists ALL authorized sources; when present, its columns index source_column_dictionary (names only). '
         'Shared permission identifies possible alternatives, NOT equivalent populations or accredited semantics. '
@@ -434,20 +482,39 @@ def recovered_population_claims(registry, claims):
                  row_id=row_id) for row_id in row_ids for column in columns]
 
 
-async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wall_seconds=1200,
+async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wall_seconds=None,
               question=QUESTION, conversation=(), context=None, system=SYSTEM,
               registry_factory=None, progress=lambda event: None, cancel=None, required_measure=None,
-              allow_query_batches=False, compact_evidence_ids=False, business_knowledge=None):
+              allow_query_batches=False, compact_evidence_ids=False, business_knowledge=None,
+              effective_scope=None):
     start = time.monotonic()
     context = context or context_for_run()
     authorize(context)
     catalog = context.catalog
+    scope_state = (effective_scope or {}).get('state') or {}
+    if scope_state.get('branches') or scope_state.get('entity_mention'):
+        # This is a generic contract guard, not an entity or amount shortcut:
+        # the published crosswalk resolves membership and both line sources
+        # must use the same period/status/currency predicates.
+        system = ('''TERRITORIAL CONTRACT OVERRIDE: The confirmed scope contains a
+business location. Do not ask whether to use document totals or line amounts.
+Answer with accredited commercial-line net: SUM(sales_line.line_total) minus
+SUM(credit_memo_line.line_total). Resolve the named location only through the
+published warehouse_business_location relation and its exact warehouse_code
+join. Your first query action must be a batch containing the two independent
+aggregates (invoice lines and credit-memo lines); do not spend a query on
+coverage or a mapping sample first. Each aggregate must use the identical
+location mapping predicates, active status, BS currency and [start,end) dates.
+Never use sales_document.doc_total or credit_memo_document.doc_total,
+never aggregate all warehouses, and never finalize a query whose SQL does not
+show the authorized mapping relation and all requested filters.
+''' + system)
     luna = luna or LunaSQL(system=system, max_output_tokens=8192)
     progress('Verificando modelo y autorización DEV')
     report.update(identifier='TELCHIAI_ADAPTIVE_BUSINESS_RESEARCH_V1', question=question,
         universe='catalog-authorized population' if registry_factory else ['L02822', 'L02823', 'L03658', 'L03649'], publication=context.publication, snapshot=context.snapshot,
         code_digest=code_digest(), catalog=asdict(catalog), system_prompt=system,
-        budget=asdict(context.effective_budget), wall_seconds=wall_seconds, status='PARTIAL',
+        budget=asdict(context.effective_budget), wall_seconds=None, status='PARTIAL',
         turns=[], model_events=[], reference_queries=[], model_configuration=dict(model='gpt-5.6-luna',
         reasoning='medium', fallback=False, store=False, provider='OpenAI Responses direct',
         max_output_tokens=8192, calls_cap=16),
@@ -455,17 +522,28 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                 'DuckDB memory limit is not a process RSS limit', 'attachment setup is not OS-preemptible',
                 'no historical classification or complete-month certification', 'narrative is not certified by arithmetic'])
     report['business_knowledge'] = business_knowledge or {}
+    report['required_measure'] = required_measure
     history = []
     # Reserve observation headroom. Large authorized publications expose their
     # complete index first, not an oversized schema blob on every model call.
     progressive_catalog = False
     if registry_factory:
-        try:
-            progressive_catalog = len(canonical(bounded_payload(
-                dict(catalog=asdict(catalog), observations=[]))).encode()) > 16384
-        except RuntimeError:
-            progressive_catalog = True
+        # The source index is the durable catalog authority. Start with no
+        # schemas and discover only selected sources; retransmitting metadata
+        # on every observation is not evidence and can exhaust the fixed budget.
+        progressive_catalog = True
     discovered_sources = set()
+    # Territorial line reconciliations have a closed, backend-accredited join
+    # contract. Preload only those existing schemas when the service-owned scope
+    # already contains a location; this avoids spending model turns rediscovering
+    # the very mapping required to preserve the user's filter and keeps the
+    # observation payload within its existing budget.
+    scope_state = (effective_scope or {}).get('state') or {}
+    if scope_state.get('branches') or scope_state.get('entity_mention'):
+        territorial_sources = {'sales_line', 'credit_memo_line',
+                               'warehouse_business_location'}
+        discovered_sources.update({table.name for table in catalog.tables
+                                   if table.name in territorial_sources})
     premature_final_feedback = False
     verification_repairs = 0
     rejected_fingerprints = set()
@@ -489,8 +567,8 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
         with executor_factory(context, authorized=True) as controls:
             results = []
             for p in (() if registry_factory else reference_proposals()):
-                if time.monotonic() - start >= wall_seconds:
-                    raise RuntimeError('research_wall_budget')
+                # A technical SQL/resource guard may stop an operation, but no
+                # elapsed-time budget terminates the business investigation.
                 decision, result = controls.execute(p, context)
                 report['reference_queries'].append(dict(proposal=asdict(p), decision=asdict(decision), result=asdict(result)))
                 save(report)
@@ -509,9 +587,8 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
         save(report)
         with executor_factory(context, authorized=True) as executor:
             for call in range(16):
-                remaining = wall_seconds - (time.monotonic() - start)
-                if remaining <= 0 or executor.cancel.is_set() or (cancel and cancel.is_set()):
-                    raise RuntimeError('research_deadline_or_memory_pressure')
+                if executor.cancel.is_set() or (cancel and cancel.is_set()):
+                    raise RuntimeError('research_cancelled_by_operator')
                 authorize(context)  # Includes live revocation for issued phase-B contexts.
                 progress('Analizando observaciones con Luna')
                 payload = dict(question=question, current_date=datetime.now(timezone.utc).date().isoformat(),
@@ -520,6 +597,7 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                                    if hasattr(registry, 'requested_calculations') else []),
                                requested_scope=(sorted(registry.requested_scope())
                                    if hasattr(registry, 'requested_scope') else []),
+                               effective_scope=effective_scope or {},
                                business_knowledge=business_knowledge or {},
                                catalog=(discovery_catalog(catalog, discovered_sources)
                                         if progressive_catalog else asdict(catalog)), observations=list(history),
@@ -534,7 +612,11 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                         payload = wire_ids.payload(payload)
                     budget = {}
                     try:
-                        payload = bounded_payload(payload, budget)
+                        territorial_wire_budget = 65536 if (
+                            (effective_scope or {}).get('state', {}).get('branches') or
+                            (effective_scope or {}).get('state', {}).get('entity_mention')) else None
+                        payload = bounded_payload(payload, budget,
+                                                   wire_budget=territorial_wire_budget)
                     except RuntimeError:
                         # Report the measured cause, never discard it: the exit is
                         # a resource limit, not a business or authorization result.
@@ -547,7 +629,10 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                         raise
                     report.setdefault('model_input_sizes', []).append(len(canonical(payload).encode()))
                     report.setdefault('observation_budget_stages', []).append(budget.get('stages'))
-                    value = await asyncio.wait_for(luna.next(payload, timeout=min(90, remaining)), remaining)
+                    # 90s is an operation deadline for one provider call, not
+                    # a deadline for the investigation. Durable replay resumes
+                    # from the last persisted checkpoint after a technical fault.
+                    value = await asyncio.wait_for(luna.next(payload, timeout=90), 90)
                     authorize(context)  # Model latency must not preserve a revoked scope.
                     report['model_calls'] = luna.calls
                     report['model_events'].append(value)
@@ -583,9 +668,18 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                         bounded_payload(dict(catalog=trial, observations=list(history)))
                     except RuntimeError:
                         history.append(dict(status='INVALID_DISCOVERY', reason='schema_byte_budget',
-                            guidance='Request fewer source schemas in this step; all sources remain available.'))
+                            guidance=('The requested schema set exceeds the observation envelope. Keep the schemas '
+                                      'already loaded, do not request additional discovery, and emit the independent '
+                                      'query using the loaded authorized sources.')))
                         continue
-                    discovered_sources = selected
+                    newly_selected = selected - discovered_sources
+                    if not newly_selected:
+                        history.append(dict(status='DISCOVERY_ALREADY_LOADED', sources=sorted(selected),
+                            guidance='These source schemas are already loaded. Do not rediscover them; emit a query or clarify the concrete business gap.'))
+                    else:
+                        discovered_sources |= selected
+                        history.append(dict(status='DISCOVERY_COMPLETE', sources=sorted(selected),
+                            guidance='Requested source schemas are now loaded. Use their exact columns and emit an independent query.'))
                     report.setdefault('catalog_discoveries', []).append(sorted(selected))
                     save(report)
                     continue
@@ -635,6 +729,21 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                         if synthesized:
                             claims = list(claims) + synthesized
                             report['population_claims'] = len(synthesized)
+                        # The State Engine owns completion of composite business
+                        # measures. Luna may omit the numeric cells after the
+                        # deterministic counterpart query has run; that prose
+                        # omission must not turn accredited evidence into PARTIAL.
+                        if required_measure == 'territorial_line_net':
+                            from .business_measure import deterministic_claims
+                            contract_claims = deterministic_claims(registry, required_measure)
+                            if contract_claims:
+                                claims = list(claims) + [claim for claim in contract_claims
+                                                         if claim not in claims]
+                                report['deterministic_contract_completion'] = {
+                                    'measure': 'commercial_line_net_amount.v1',
+                                    'claims_added': len(contract_claims),
+                                    'source': 'state_engine_executed_cells',
+                                }
                     report['claim_verifications'] = [registry.verify(c) for c in claims]
                     verification_seconds += time.monotonic()-verification_started
                     checks = report['claim_verifications']
@@ -643,7 +752,7 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                         proposed_answer_state='UNVERIFIED_MODEL_PROPOSAL_NOT_EVIDENCE'))
                     mismatches = [c for c in checks if not c['match']]
                     fingerprint = canonical([c['claim'] for c in mismatches])
-                    coverage_feedback = (registry.final_feedback(claims, net_required=required_measure == 'net_document')
+                    coverage_feedback = (registry.final_feedback(claims, net_required=required_measure in {'net_document', 'territorial_line_net'})
                         if hasattr(registry, 'final_feedback') else None)
                     # A demonstrated scope contradiction outranks a numeric
                     # repair: the numbers of a rejected interpretation are not
@@ -795,6 +904,65 @@ async def run(report, save, *, luna=None, executor_factory=AdaptiveExecutor, wal
                     authorized=asdict(query) if query else None, decision=asdict(decision),
                     result=asdict(result), execution_timing=getattr(executor, 'last_timing', {}),
                     model_observation=observation, independent_relationship_checks=relations))
+                # A composite measure owns its pending components. Once the
+                # sales-line component is observed, continue with the existing
+                # investigator using the exact admitted predicates, rather than
+                # relying on Luna to remember credit memos or accepting zero.
+                if (required_measure == 'territorial_line_net'
+                        and result.status == 'COMPLETED'
+                        and ('sales_line' in p.requested_sources
+                             or 'sales_line' in p.sql
+                             or (manifest and manifest.get('source') == 'sales_line')
+                             or (manifest and any(c.get('name') == 'line_total'
+                                                   for c in manifest.get('columns', []))))
+                        and not any('credit_memo_line' in (turn.get('proposal', {}).get('requested_sources') or [])
+                                    for turn in report['turns'])):
+                    from .business_measure import paired_component_proposal
+                    # Reuse the already executed, accredited mapping observation
+                    # when the sales query used an explicit warehouse predicate.
+                    # Credit memo warehouse codes are not assumed identical to
+                    # invoice codes; the published crosswalk supplies them.
+                    mapping_codes = []
+                    for mapping_manifest, _mq, _mr, mapping_rows, _mn, mapping_source in getattr(registry, 'entries', {}).values():
+                        if mapping_source != 'warehouse_business_location':
+                            continue
+                        names = [column.name for column in mapping_manifest.columns]
+                        try:
+                            warehouse_index = names.index('warehouse_code')
+                        except ValueError:
+                            continue
+                        for row in mapping_rows:
+                            if isinstance(row, (list, tuple)) and warehouse_index < len(row):
+                                value = row[warehouse_index]
+                                if isinstance(value, str):
+                                    mapping_codes.append(value)
+                    scope_entity = ((effective_scope or {}).get('state') or {}).get('entity_mention')
+                    if isinstance(scope_entity, dict):
+                        scope_entity = scope_entity.get('text')
+                    elif not isinstance(scope_entity, str):
+                        scope_entity = None
+                    if not scope_entity:
+                        branches = ((effective_scope or {}).get('state') or {}).get('branches') or ()
+                        scope_entity = branches[0] if branches else None
+                    paired = paired_component_proposal(
+                        p, required_measure, mapping_codes=mapping_codes,
+                        territory_code=scope_entity)
+                    if paired is not None:
+                        report.setdefault('deterministic_continuations', []).append({
+                            'component': 'credit_memo_line',
+                            'source_query_turn': len(report['turns']),
+                            'status': 'scheduled',
+                        })
+                        pending_queries.append(dict(
+                            action='query', sql=paired.sql, objective=paired.objective,
+                            justification=paired.justification,
+                            requested_sources=list(paired.requested_sources),
+                            expected_grain=paired.expected_grain,
+                            expected_result=paired.expected_result,
+                            candidate_relations=[asdict(r) for r in paired.candidate_relations],
+                            hypothesis='Required credit-memo component of the confirmed territorial net measure',
+                            prior_observation_interpretation='Sales component is already observed; execute only the pending counterpart.',
+                            hypothesis_state='OPEN', evidence_turns=[]))
                 history.append(observation)
                 # Catch semantic contradictions while query budget remains,
                 # not only after a final has exhausted it. Feedback does not

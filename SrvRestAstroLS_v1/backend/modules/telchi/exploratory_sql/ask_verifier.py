@@ -618,16 +618,28 @@ class AskRegistry(EvidenceRegistry):
         if not isinstance(a, Decimal) or not isinstance(b, Decimal):
             raise ValueError('numeric_calculation_dependencies_required')
         net_pair = False
+        territorial_pair = False
         if claim.get('operation') == 'subtract' and all(d.get('kind') == 'executed_cell' for d in dependencies):
             sources = [self._executed_cell(d)[1][2] for d in dependencies]
             if sources == ['sales_document', 'credit_memo_document']:
                 if self._document_scope(dependencies[0])[1] != self._document_scope(dependencies[1])[1]:
                     raise ValueError('net_document_scopes_must_match')
                 net_pair = True
+            elif sources == ['sales_line', 'credit_memo_line']:
+                from .business_measure import TERRITORIAL_LINE_NET, _source_signature
+                try:
+                    left = _source_signature(self, dependencies[0])[1]
+                    right = _source_signature(self, dependencies[1])[1]
+                except (ValueError, KeyError, TypeError, IndexError):
+                    raise ValueError('territorial_line_components_invalid') from None
+                if left != right:
+                    raise ValueError('territorial_line_scopes_must_match')
+                territorial_pair = True
         signatures = [self._calculation_signature(d) for d in dependencies]
         scopes = ([self._operand_scope(d)[1] for d in dependencies]
                   if not net_pair and all(d.get('kind') == 'executed_cell' for d in dependencies) else None)
-        return self.calculate_pair(claim.get('operation'), a, b, signatures, scopes, net_pair=net_pair)
+        return self.calculate_pair(claim.get('operation'), a, b, signatures, scopes,
+                                   net_pair=(net_pair or territorial_pair))
 
     @staticmethod
     def calculate_pair(operation, a, b, signatures, scopes, *, net_pair=False):
@@ -833,8 +845,17 @@ class AskRegistry(EvidenceRegistry):
                             'identity/measure cells of that result, plus the same-filter distinct count if '
                             'the question asks how many, and state that the remaining rows are a local '
                             'presentation page of a fully recovered universe.')
-        if net_required and not any(net_pair(c) for c in claims if isinstance(c, dict)):
-            return 'Net requested/inherited: obtain matching invoice AND credit memo document sums for each period/filter; submit their subtraction. Invoice-only evidence is incomplete.'
+        if net_required:
+            from .business_measure import contract_for, verify
+            contract_result = verify(self, claims, net_required)
+            if not contract_result.get('complete'):
+                missing = ', '.join(contract_result.get('missing') or ('scope',))
+                if net_required == 'territorial_line_net':
+                    return ('Medida empresarial territorial incompleta: faltan componentes acreditados: ' + missing
+                            + '. Ejecutá SUM(line_total) en sales_line y credit_memo_line con el mismo período, '
+                            'los mismos 18 almacenes, canal, moneda y publicación; luego presentá la resta. '
+                            'No sustituyas el componente faltante por cero ni uses totales de cabecera.')
+                return 'Net requested/inherited: obtain matching invoice AND credit memo document sums for each period/filter; submit their subtraction. Invoice-only evidence is incomplete.'
         return None
 
     def _has_recovered_account_population(self):

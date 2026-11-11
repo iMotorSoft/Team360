@@ -60,7 +60,12 @@ SCOPE_FIELDS = {
     'ranking_by': None,          # 'amount' | 'quantity': explicit product-ranking request
 }
 # Service-owned projection of the executed scope. Never written by the model.
-OWNED_SCOPE_FIELDS = {'focus': None, 'customer_type': None}
+OWNED_SCOPE_FIELDS = {
+    'focus': None, 'customer_type': None,
+    # Service-owned effective-scope receipt shared by capabilities and research.
+    # It is never writable through a model state delta.
+    'scope_contract': None,
+}
 METRICS = {'sales.net_amount', 'sales.source_top_items', 'sales.latest_documents', 'sales.coverage',
            'products.search', 'sales.by_products', 'sales.product_line_amount_ranking',
            'sales.commercial_line_amount_by'} | set(OPERATIONS)
@@ -87,10 +92,15 @@ def limit_family(metric):
 def answers_pending(pending, delta):
     """True when the delta fills the slot the open clarification is asking for."""
     published = {'metric': '/metric', 'period': '/period', 'branches': '/branches',
-                 'comparison': '/comparison', 'reference': '/reference'}
+                 'sales_channel': '/sales_channel', 'comparison': '/comparison', 'reference': '/reference'}
     path = published.get(((pending or {}).get('spec') or {}).get('slot'))
     if not path or not isinstance(delta, dict):
         return False
+    # Explicitly selecting all channels is represented by clearing the previous
+    # channel filter. The surrounding commercial contract validates that this
+    # null is user-authored, so it is a real answer rather than an omitted slot.
+    if ((pending or {}).get('spec') or {}).get('slot') == 'sales_channel':
+        return path in (delta.get('set') or {})
     return (delta.get('set') or {}).get(path) not in (None, [], {})
 
 
@@ -521,6 +531,7 @@ def process(before, proposal, history, turn_id):
         if intent not in INTENTS or action not in ACTIONS:
             raise ValueError('invalid_enum')
         base = deepcopy(before)
+        pending_lifecycle = None
         if intent == 'NEW_QUERY':
             base.pop('limit', None)
             base.pop('ranking_target_item_code', None)
@@ -539,7 +550,7 @@ def process(before, proposal, history, turn_id):
         if action == 'ASK':
             spec = proposal['clarification']
             if (not isinstance(spec, dict) or set(spec) != {'slot', 'question'}
-                    or spec['slot'] not in {'metric', 'period', 'branches', 'comparison', 'reference'}
+                    or spec['slot'] not in {'metric', 'period', 'branches', 'sales_channel', 'comparison', 'reference'}
                     or not isinstance(spec['question'], str) or not 0 < len(spec['question']) <= 300):
                 raise ValueError('invalid_clarification')
             # A follow-up ASK must retain the known slots from the previous ASK.
@@ -553,17 +564,21 @@ def process(before, proposal, history, turn_id):
             known = patch(dict(base, pending=None), delta)
             slot = spec['slot']
             if ((slot == 'metric' and known.get('requested_metrics'))
+                    or (slot == 'sales_channel' and known.get('sales_channel') is not None)
                     or (known.get('schema_version') == 2 and slot == 'period'
                         and (known['period'] is not None or known.get('temporal_reference')))):
                 raise ValueError('clarification_already_answered')
             # Known proposal stays pending, never modifies the active request.
             after = deepcopy(before)
             after['pending'] = dict(spec=deepcopy(spec), proposed=known,
-                                    base_state_hash=state_hash(dict(before, pending=None)), source_turn_id=turn_id)
+                                    base_state_hash=state_hash(dict(before, pending=None)), source_turn_id=turn_id,
+                                    status='PENDING')
+            pending_lifecycle = ['PENDING']
         else:
             if proposal['clarification'] is not None:
                 raise ValueError('unexpected_clarification')
             if before['pending'] and intent in {'ANSWER_CLARIFICATION', 'CORRECT'}:
+                pending_lifecycle = ['PENDING', 'RESOLVED']
                 pending = before['pending']
                 if pending['base_state_hash'] != state_hash(dict(before, pending=None)):
                     raise ValueError('stale_pending')
@@ -594,7 +609,10 @@ def process(before, proposal, history, turn_id):
                     or (after['period'] is None and after['metric'] not in ({'sales.latest_documents', 'sales.coverage', 'products.search', 'sales.by_products'} | SNAPSHOT_METRICS))):
                 raise ValueError('not_ready')
         validate(after)
-        return dict(output=deepcopy(proposal), state_after=after, committed=True, contract_error=None)
+        if pending_lifecycle and action == 'EXECUTE':
+            pending_lifecycle.extend(('EXECUTING', 'COMPLETED'))
+        return dict(output=deepcopy(proposal), state_after=after, committed=True, contract_error=None,
+                    pending_lifecycle=pending_lifecycle)
     except (ValueError, TypeError, KeyError, AttributeError) as exc:
         # Do not leak parser/driver messages or let corrupt prior state become a
         # research route. Only a validated before-state and a known catalog error

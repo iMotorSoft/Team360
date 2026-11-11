@@ -8,7 +8,7 @@ a product, a customer or a month.
 from copy import deepcopy
 from datetime import date, timedelta
 
-from .state_engine import scope_window
+from .state_engine import scope_window, state_hash
 
 MEASURE = 'commercial_active_invoice_line_amount_excluding_line_tax_v1'
 UNIVERSE = 'active_bs_invoice_lines'
@@ -41,6 +41,60 @@ def period_label(periods, single=None):
     return ', '.join(labels)
 
 
+def scope_receipt_id(contract):
+    """Stable, non-sensitive identifier for an effective-scope boundary."""
+    import hashlib
+    import json
+    return hashlib.sha256(json.dumps(contract or {}, sort_keys=True,
+                                     separators=(',', ':'), ensure_ascii=False).encode()).hexdigest()
+
+
+def scope_audit_entry(contract, stage, *, source='backend'):
+    """Audit a scope crossing without copying model prose or business results."""
+    value = dict(contract or {})
+    return {
+        'stage': stage,
+        'scope_id': scope_receipt_id(value),
+        'state_hash': value.get('state_hash'),
+        'resolution': value.get('resolution'),
+        'coverage': value.get('coverage'),
+        'provenance': dict(value.get('provenance') or {}),
+        'explicit_filter_names': sorted((value.get('explicit_filters') or {}).keys()),
+        'inherited_confirmed_filter_names': sorted((value.get('inherited_confirmed_filters') or {}).keys()),
+        'inherited_ambiguous_filter_names': sorted((value.get('inherited_ambiguous_filters') or {}).keys()),
+        'source': source,
+    }
+
+
+def effective_scope(state, *, question=None, intent=None, resolution='confirmed', coverage='unknown'):
+    """Return the single service-owned scope contract for every execution path.
+
+    The contract deliberately records provenance rather than treating state as a
+    bag of inherited filters.  Consumers may reuse accredited knowledge, but
+    only restrictions marked explicit/confirmed are execution predicates.
+    """
+    value = scope(state)
+    previous = state.get('scope_contract') or {}
+    explicit = dict(previous.get('explicit_filters') or {})
+    inherited = dict(previous.get('inherited_confirmed_filters') or {})
+    ambiguous = dict(previous.get('inherited_ambiguous_filters') or {})
+    return dict(
+        original_question=question if question is not None else previous.get('original_question'),
+        intent=intent or previous.get('intent'),
+        resolution=resolution,
+        measure=value.get('metric'), period=value.get('period'),
+        periods=value.get('periods'), entities={'branches': value.get('branches', []),
+                                                'entity_mention': value.get('entity_mention')},
+        dimensions={'group_by': value.get('dimension'), 'breakdown_by': value.get('breakdown')},
+        explicit_filters=explicit, inherited_confirmed_filters=inherited,
+        inherited_ambiguous_filters=ambiguous,
+        accredited_constraints=list(previous.get('accredited_constraints') or []),
+        provenance=dict(previous.get('provenance') or {}), coverage=coverage,
+        permissions=previous.get('permissions'), workspace=previous.get('workspace'),
+        state_hash=state_hash(dict(state, scope_contract=None)),
+    )
+
+
 def scope(state):
     """The business scope carried by the state. Never contains business values."""
     window = scope_window(state)
@@ -53,6 +107,7 @@ def scope(state):
         excluded_products=state.get('excluded_products'),
         product_offset=state.get('product_offset', 0),
         category=state.get('business_category'),
+        entity_mention=deepcopy(state.get('entity_mention')),
         product=state.get('product_target'),
         customer=state.get('customer_target'),
         focus=dict(focus),

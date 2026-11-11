@@ -45,7 +45,9 @@ def create_telchi_handler(*, policy, pool=None):
     from .capabilities import SalesCapabilities
     handler = TelchiHandler(store=PostgresConversationStore(pool), authorization=BusinessAuthorization(policy),
                            concept_resolver=resolver, semantics_connection=semantics_connection,
-                           turn_timeout_seconds=300 if durable else 80,
+                           # Research is durable and has no total-turn deadline;
+                           # the fast path may retain its short technical guard.
+                           turn_timeout_seconds=None if researcher is not None else (300 if durable else 80),
                            capabilities=SalesCapabilities(timeout_seconds=180) if durable else None,
                            researcher=researcher)
     return handler
